@@ -2,159 +2,169 @@
 
 int input_check() {
 	int sw;
-	while (!(wcin >> sw) || wcin.peek() != L'\n') {
-		wcin.clear();
-		wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
-		error_message(L"Вы можете ввести только цифры");
+	while (!(cin >> sw) || cin.peek() != '\n') {
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		error_message("Вы можете ввести только цифры");
 	}
 	return sw;
 }
 
 int switch_sort() {
 	system("cls");
-	wcout << L"Выбериет опцию:" << endl;
-	wcout << L"1)В алфавитном порядке//по возврастанию." << endl;
-	wcout << L"2)Не в алфавитном порядке//по убыванию." << endl;
-	wcout << L"3)Выход." << endl;
+	cout << "Выбериет опцию:" << endl;
+	cout << "1)В алфавитном порядке//по возврастанию." << endl;
+	cout << "2)Не в алфавитном порядке//по убыванию." << endl;
+	cout << "3)Выход." << endl;
 	return input_check();
 }
 
-void error_message(wstring message) {
+void error_message(string message) {
 	SetConsoleTextAttribute(handle, FOREGROUND_RED);
-	wcout << message << endl;
+	cout << message << endl;
 	SetConsoleTextAttribute(handle, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 }
 
-void complete_message(wstring message) {
+void complete_message(string message) {
 	SetConsoleTextAttribute(handle, FOREGROUND_GREEN);
-	wcout << message << endl;
+	cout << message << endl;
 	SetConsoleTextAttribute(handle, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE);
 }
 
-bool check_date(wstring str, wstring type) {
+bool check_date(string str) {
 	if (str.size() != 10) {
-		error_message(L"Дата дожна быть длиной 10 символов.");
+		error_message("Дата дожна быть длиной 10 символов.");
 		return false;
 	}
-	if (str[2] != L'.' || str[5] != L'.')
+	if (str[4] != '-' || str[7] != '-')
 	{
-		error_message(L"Неверный формат даты.");
+		error_message("Неверный формат даты.");
 		return false;
 	}
 	for (register int i = 0; i < 10; i++)
-		if (!isdigit(str[i]) && str[i] != L'.')
+		if (!isdigit(str[i]) && str[i] != '-')
 		{
-			error_message(L"В дате могут быть только цифры и точки.");
+			error_message("В дате могут быть только цифры и тире.");
 			return false;
 		}
-	wstring date, month, year;
-	date = str.substr(0, 2);
-	month = str.substr(3, 2);
-	year = str.substr(6, 4);
+	string date, month, year;
+	date = str.substr(8, 2);
+	month = str.substr(5, 2);
+	year = str.substr(0, 4);
+
 	int da, mo, ye;
 	da = stoi(date);
 	mo = stoi(month);
 	ye = stoi(year);
+
 	int flag = 0;
 	time_t now = time(0);
 	struct tm local;
 	localtime_s(&local, &now);
-	while (1) {
-		if (ye < 1950) {
-			error_message(L"Год не может быть введен раньше чем 1950");
-			flag++;
-			break;
-		}
-		if (type == L"stud")
-			if (ye > local.tm_year + 1900 - 15)
-			{
-				error_message(L"Студент не может быть настолько молод.");
-				flag++;
-				break;
-			}
-		if (mo > 12 || mo == 0) {
-			error_message(L"Неверное количество месяцев.");
-			flag++;
-			break;
-		}
-		if (da > 31 || da == 0) {
-			error_message(L"Неверное количество дней.");
-			flag++;
-			break;
-		}
-		if (ye > local.tm_year + 1900)
-		{
-			error_message(L"Эта дата еще не наступила.");
-			flag++;
-			break;
-		}
-		if (ye == local.tm_year + 1900)
-			if (mo > local.tm_mon + 1)
-			{
-				error_message(L"Эта дата еще не наступила.");
-				flag++;
-				break;
-			}
-		if (ye == local.tm_year + 1900)
-			if (mo == local.tm_mon + 1)
-				if (da > local.tm_mday)
-				{
-					error_message(L"Эта дата еще не наступила.");
-					flag++;
-					break;
-				}
-		if (ye % 4 == 0)
-			if (mo == 2)
-				if (da > 29 || da == 0)
-				{
-					error_message(L"В високосный год в феврале максимум 29 чисел.");
-					flag++;
-					break;
-				}
-		if (ye % 4 != 0)
-			if (mo == 2)
-				if (da > 28 || da == 0)
-				{
-					error_message(L"В не високосный год в феврале максимум 28 чисел.");
-					flag++;
-					break;
-				}
-		if (mo == 4 || mo == 6 || mo == 9 || mo == 11)
-			if (da > 30) {
-				error_message(L"Неверное количество дней. В этом месяце максимум 30 дней.");
-				flag++;
-				break;
-			}
-		break;
+
+	if (mo > 12 || mo == 0) {
+		error_message("Неверное количество месяцев.");
+		return false;
 	}
-	if (flag == 0) return true;
-	else return false;
+	if (da > 31 || da == 0) {
+		error_message("Неверное количество дней.");
+		return false;
+	}
+	if (ye % 4 == 0)
+		if (mo == 2)
+			if (da > 29 || da == 0)
+			{
+				error_message("В високосный год в феврале максимум 29 чисел.");
+				return false;
+			}
+	if (ye % 4 != 0)
+		if (mo == 2)
+			if (da > 28 || da == 0)
+			{
+				error_message("В не високосный год в феврале максимум 28 чисел.");
+				return false;
+			}
+	if (mo == 4 || mo == 6 || mo == 9 || mo == 11)
+		if (da > 30) {
+			error_message("Неверное количество дней. В этом месяце максимум 30 дней.");
+			return false;
+		}
+	return true;
 }
 
-bool is_russian_alpha(wchar_t c) {
-	return (c >= L'А' && c <= L'я' || c == L' ' || c == L'Ё' || c == L'ё');
+bool is_expired_date(string str) { //true if expired
+	if (check_date(str))
+	{
+		time_t now = time(0);
+		struct tm local;
+		localtime_s(&local, &now);
+
+		string date, month, year;
+		date = str.substr(8, 2);
+		month = str.substr(5, 2);
+		year = str.substr(0, 4);
+		int da, mo, ye;
+		da = stoi(date);
+		mo = stoi(month);
+		ye = stoi(year);
+
+		if (ye > local.tm_year) return true;
+		else if (ye < local.tm_year) return false;
+		else {
+			if (mo > local.tm_mon) return true;
+			else if (mo < local.tm_mon) return false;
+			else
+				return (da > local.tm_mday) ? true : false;
+		}
+	}
+	else
+		return false;
+}
+
+bool is_russian_alpha(char c) {
+	return (c >= 'А' && c <= 'я' || c == ' ' || c == 'Ё' || c == 'ё');
 }
 
 bool is_repeat_operation() {
-	wcout << L"Чтобы продолжить в меню 2-го уровня нажмите любую клавишу." << endl;
-	wcout << L"Чтобы вернуться в меню первого уровня нажмите esc." << endl;
-	return(_getwch() != 27);
+	cout << "Чтобы продолжить в этом окне нажмите любую клавишу." << endl;
+	cout << "Чтобы вернуться в меню Назад нажмите esc." << endl;
+	return(_getch() != 27);
 }
 
-wstring s_to_ws(const std::string& s)
-{
-	wstring ws;
-	std::wstring wsTmp(s.begin(), s.end());
+string current_date() {
+	string cur_date;
 
-	ws = wsTmp;
+	time_t now = time(0);
+	struct tm local;
+	localtime_s(&local, &now);
 
-	return ws;
+	cur_date = to_string(local.tm_year + 1900) + "-" + to_string(local.tm_mon) + "-" + to_string(local.tm_mday);
+
+	return cur_date;
 }
 
-string ws_to_s(const std::wstring& wstr)
-{
-	using convert_typeX = std::codecvt_utf8<wchar_t>;
-	std::wstring_convert<convert_typeX, wchar_t> converterX;
+//
+//wstring s_to_ws(const std::string& s)
+//{
+//	std::wstring ws(s.begin(), s.end());
+//
+//	return ws;
+//}
+//
+//string ws_to_s(const std::wstring& wstr)
+//{
+//	using convert_typeX = std::codecvt_utf8<wchar_t>;
+//	std::wstring_convert<convert_typeX, wchar_t> converterX;
+//
+//	return converterX.to_bytes(wstr);
+//}
 
-	return converterX.to_bytes(wstr);
+ostream& grey_cl(ostream& stream) {
+	SetConsoleTextAttribute(handle, FOREGROUND_INTENSITY);
+	return stream;
+}
+
+ostream& white_cl(ostream& stream) {
+	SetConsoleTextAttribute(handle, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+	return stream;
 }

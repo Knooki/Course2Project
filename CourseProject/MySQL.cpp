@@ -7,54 +7,64 @@
 //customer
 //ksusha 12345
 
-vector<vector<wstring>> MySQL::db_connection(wstring query)
+vector<vector<string>> MySQL::db_connection(string query)
 {
-	vector<vector<wstring>> result;
+	vector<vector<string>> result;
 
 	// Получаем дескриптор соединения
-	this->conn = mysql_init(NULL);
+
+	this->conn = mysql_init(&mysql);
+	mysql_options(this->conn, MYSQL_SET_CHARSET_NAME, "cp1251");
+	mysql_options(this->conn, MYSQL_INIT_COMMAND, "SET NAMES cp1251");
 
 	if (this->conn == NULL)
 	{
 		// Если дескриптор не получен – выводим сообщение об ошибке
-		wcout << stderr << L" Error: can'tcreate MySQL-descriptor\n";
+		cout << stderr << " Error: can'tcreate MySQL-descriptor\n";
 		//exit(1); //Если используется оконное приложение
 	}
+
+	//mysql_options(&mysql, MYSQL_SET_CHARSET_NAME, "utf8");
+	//mysql_options(&mysql, MYSQL_INIT_COMMAND, "SET NAMES utf8");
+
 	// Подключаемся к серверу
 	if (!mysql_real_connect(this->conn, "localhost", "root", "venia11let", "course_project", NULL, NULL, 0))
 	{
 		// Если нет возможности установить соединение с сервером
 		// базы данных выводим сообщение об ошибке
-		wcout << stderr << L" Error: can'tconnecttodatabase %s\n" << mysql_error(this->conn) << endl;
+		cout << stderr << " Error: can'tconnecttodatabase %s\n" << mysql_error(this->conn) << endl;
 	}
 
-	mysql_set_character_set(this->conn, "utf8");
-	string que = ws_to_s(query);
-	mysql_query(this->conn, que.c_str()); //Делаем запрос к таблице
+	//cout << "connectioncharacterset: " << mysql_character_set_name(this->conn) << endl;
 
-	vector<wstring> row_;
+	mysql_query(conn, query.c_str()); //Делаем запрос к таблице
+
+	vector<string> row_;
+
+	string item;
+	char* ch = nullptr;
 
 	if (this->res = mysql_store_result(this->conn)) {
-		for (register int i = 0; this->row = mysql_fetch_row(this->res); i++) {
+		while (this->row = mysql_fetch_row(this->res)) {
 			for (register int j = 0; j < mysql_num_fields(this->res); j++) {
-				string item = row[j];
-				row_.push_back(s_to_ws(item));
+				ch = new char[sizeof(row[j]) + 1];
+				ch = row[j];
+				if (ch == nullptr)
+				{
+					ch = new char[1];
+					*ch = '\0';
+				}
+				item = string(ch);
+				row_.push_back(item);
 			}
 			result.push_back(row_);
 			row_.clear();
 		}
 	}
-	else wcout << stderr << L"%s\n" << mysql_error(this->conn);
+	else cout << stderr << mysql_error(conn);
 
 	// Закрываем соединение с сервером базы данных
 	mysql_close(this->conn);
-
-	/*for (register int i = 0; i < result.size(); i++)
-	{
-		for (register int j = 0; j < result[i].size(); j++)
-			wcout << result[i][j] << L" ";
-		wcout << endl;
-	}*/
 
 	return result;
 }

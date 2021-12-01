@@ -5,12 +5,14 @@
 #include "Customer.h"
 
 int main() {
-	_setmode(_fileno(stdout), _O_U16TEXT);
-	_setmode(_fileno(stdin), _O_U16TEXT);
+	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
 
 	handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	HomePage enter;
+	User user;
+
+	HomePage enter(&user);
 	enter.logic();
 
 	return(0);

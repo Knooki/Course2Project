@@ -4,14 +4,22 @@
 
 class Authentication {
 private:
-	wstring login = L"";
-	wstring password = L"";
+	User* user;
+
+	string login = "";
+	string password = "";
+	string username = "";
 
 	void password_entry();
-	vector<vector<wstring>> auth_data;
+	vector<vector<string>> auth_data;
 	int auth_menu();
-	User log_in(User user);
-	User sign_up(User user);
+	void log_in();
+	void sign_up();
 public:
-	User identification(User user);
+	Authentication(User* user) {
+		this->user = user;
+	}
+
+	User* identification();
+	User* change_password();
 };

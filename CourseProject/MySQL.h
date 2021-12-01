@@ -3,12 +3,11 @@
 #include <mysql.h>
 
 class MySQL {
-	MYSQL* conn;
+	MYSQL* conn, mysql;
 	MYSQL_RES* res;
 	MYSQL_ROW row;
 
-	string query;
 public:
 
-	vector<vector<wstring>> db_connection(wstring query);
+	vector<vector<string>> db_connection(string query);
 };
